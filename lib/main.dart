@@ -58,8 +58,24 @@ class _MyHomePageState extends State<MyHomePage> {
           icon: Icon(Icons.add_box_outlined),
           label: 'Orders',
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.notifications_none),
+        BottomNavigationBarItem(
+          icon: Stack(
+            children: const [
+              Icon(Icons.notifications_none),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Visibility(
+                  visible: false,
+                  child: Icon(
+                    Icons.brightness_1,
+                    color: Color(0xffE7A546),
+                    size: 8,
+                  ),
+                ),
+              )
+            ],
+          ),
           label: 'Notifications',
         ),
         const BottomNavigationBarItem(
