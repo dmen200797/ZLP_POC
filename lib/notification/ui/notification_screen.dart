@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:zlp_poc/notification/ui/widgets/noti_item.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -9,54 +10,35 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  List<NotiObject> notiList = [];
 
-  List<NotiObject> notiList = [
-    NotiObject(
-      time: DateTime(2022, 11, 4, 23, 45),
-      isRead: false,
-      highlight: 'salesrepname',
-      itemAmount: 1,
-      orderId: '#5468904',
-      title: 'Order Created',
-      notiTypes: NotiTypes.create,
-    ),
-    NotiObject(
-      time: DateTime(2022, 11, 24, 15, 45),
-      isRead: false,
-      highlight: 'salesrepname',
-      itemAmount: 6,
-      orderId: '#5468904',
-      title: 'Order Created',
-      notiTypes: NotiTypes.create,
-    ),
-    NotiObject(
-      time: DateTime(2022, 11, 20, 6, 24),
-      isRead: true,
-      highlight: 'Cancelled',
-      itemAmount: 4,
-      orderId: '#5463634',
-      title: 'Order Item - Cancelled',
-      notiTypes: NotiTypes.cancelled,
-    ),
-    NotiObject(
-      time: DateTime(2022, 11, 24, 12, 45),
-      isRead: false,
-      highlight: 'salesrepname',
-      itemAmount: 1,
-      orderId: '#5468904',
-      title: 'Order Created',
-      notiTypes: NotiTypes.create,
-    ),
-    NotiObject(
-      time: DateTime(2022, 11, 20, 6, 24),
-      isRead: true,
-      highlight: 'Cancelled',
-      itemAmount: 2,
-      orderId: '#5463634',
-      title: 'Order Item - Cancelled',
-      notiTypes: NotiTypes.cancelled,
-    ),
-  ];
+  String readRepositories = r'''
+query GetUserNotifications {
+  GetUserNotifications(userID: 100, currentPage: 1){
+    notifications{
+      id
+      userID
+      isRead
+      title
+      description
+      paymentID
+      orderID
+      createdAt
+      updatedAt
+      imageURL
+      type
+      returnRequestID
+    }
+    paging{
+      perPage
+      currentPage
+      totalItems
+      totalPages
+      totalItems
+    }
+  }
+}
+  ''';
 
   @override
   Widget build(BuildContext context) {
@@ -97,16 +79,49 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return NotiItem(notiObject: notiList[index]);
-            },
-            itemCount: notiList.length,
+        Query(
+          options: QueryOptions(
+            document: gql(readRepositories),
           ),
+          builder: (QueryResult result, {refetch, fetchMore}) {
+            debugPrint('===========RESULT========${result.data}');
+            if (result.data == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final repositories = (result.data!["GetUserNotifications"]
+                ["notifications"] as List<dynamic>);
+            notiList = repositories.map(
+              (e) => NotiObject(
+                time: DateTime.fromMillisecondsSinceEpoch(e['createdAt']),
+                isRead: e['isRead'] == true,
+                highlight: e['userID'].toString(),
+                itemAmount: 2,
+                orderId: e['orderID'],
+                title: e['title'],
+                notiTypes: getType(e['type']),
+              ),
+            ).toList();
+            return Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return NotiItem(notiObject: notiList[index]);
+                },
+                itemCount: notiList.length,
+              ),
+            );
+          },
         ),
       ],
     );
+  }
+
+  NotiTypes getType(String type) {
+    switch (type) {
+      case '':
+        return NotiTypes.cancelled;
+      default:
+        return NotiTypes.create;
+    }
   }
 }
 

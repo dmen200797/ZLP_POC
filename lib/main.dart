@@ -1,24 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flutter Demo',
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    final HttpLink httpLink =
+        HttpLink('http://172.105.125.149:8090/query', defaultHeaders: {
+      'accept': '*/*',
+      'Content-Type': 'application/json;charset=UTF-8',
+    });
+
+    // final AuthLink authLink = AuthLink(
+    //   getToken: () async => 'Bearer',
+    //   // OR
+    //   // getToken: () => 'Bearer <YOUR_PERSONAL_ACCESS_TOKEN>',
+    // );
+
+    // final Link link = authLink.concat(httpLink);
+
+    ValueNotifier<GraphQLClient> client = ValueNotifier(
+      GraphQLClient(
+        link: httpLink,
+        // The default store is the InMemoryStore, which does NOT persist to disk
+        cache: GraphQLCache(),
+      ),
+    );
+    return GraphQLProvider(
+      client: client,
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'ZPL POC',
+        home: CacheProvider(child: MyHomePage(title: 'ZPL POC')),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -28,6 +55,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   final List<Widget> widgetOptions = const [
     Text(
@@ -87,16 +119,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xff234455),
-        title: Text(widget.title),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          backgroundColor: const Color(0xff234455),
+          title: Text(widget.title),
+        ),
       ),
-      body: Center(child: widgetOptions.elementAt(currentIndex)),
+      body:
+          SafeArea(child: Center(child: widgetOptions.elementAt(currentIndex))),
       bottomNavigationBar: BottomNavigationBar(
         items: listBottomItem,
         currentIndex: currentIndex,
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: HexColor('#8DAFAA'),
+        unselectedItemColor: HexColor('#234455'),
         onTap: (index) {
           currentIndex = index;
           setState(() {});
@@ -104,4 +140,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

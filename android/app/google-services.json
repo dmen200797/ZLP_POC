@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "1027908358442",
+    "project_id": "zlp001",
+    "storage_bucket": "zlp001.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027908358442:android:9e7dd26684b95f9337ce53",
+        "android_client_info": {
+          "package_name": "com.example.zlp_poc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027908358442-1luire27j740amqe7sofso3grc29vbn9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zlp_poc",
+            "certificate_hash": "92a1198692f9734ce3470b49c5ffc87bbc653aba"
+          }
+        },
+        {
+          "client_id": "1027908358442-f22ec3h2uf8gfdsvs8mr6vccghh07gv3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa64XPxn5CsvAMq-5rkjBBrl6xexv9gnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027908358442-f22ec3h2uf8gfdsvs8mr6vccghh07gv3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1027908358442-e1qoh11tkpkcv7ei4nnln1uf752f0jd6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zuelligpharma.zuelligPocNotification"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027908358442:android:cc5dc5293934df8737ce53",
+        "android_client_info": {
+          "package_name": "com.zuelligpharma.zuellig_poc_notification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027908358442-ctrdpgnu0a9009n0e0pusgtr8n2igh4d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zuelligpharma.zuellig_poc_notification",
+            "certificate_hash": "92a1198692f9734ce3470b49c5ffc87bbc653aba"
+          }
+        },
+        {
+          "client_id": "1027908358442-f22ec3h2uf8gfdsvs8mr6vccghh07gv3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa64XPxn5CsvAMq-5rkjBBrl6xexv9gnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027908358442-f22ec3h2uf8gfdsvs8mr6vccghh07gv3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1027908358442-e1qoh11tkpkcv7ei4nnln1uf752f0jd6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zuelligpharma.zuelligPocNotification"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
