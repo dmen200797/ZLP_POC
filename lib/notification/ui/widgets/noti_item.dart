@@ -14,10 +14,16 @@ class NotiItem extends StatefulWidget {
 
 class _NotiItemState extends State<NotiItem> {
   bool isShow = true;
+  String changeNotificationStatus = '';
 
   @override
   void initState() {
     widget.notiObject.isRead ?? true ? (isShow = false) : (isShow = true);
+    changeNotificationStatus = '''
+mutation changeNotificationStatus {
+  changeNotificationStatus(notificationID: ${widget.notiObject.notiID})
+}
+  ''';
     super.initState();
   }
 
@@ -55,7 +61,14 @@ class _NotiItemState extends State<NotiItem> {
                           ),
                         ),
                         const SizedBox(height: 3),
-                        getContent(widget.notiObject),
+                        Text(
+                          widget.notiObject.description ?? '',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xff656565),
+                          ),
+                        ),
+                        // getContent(widget.notiObject),
                         const SizedBox(height: 5),
                         Row(
                           children: [

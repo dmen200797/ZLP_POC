@@ -12,7 +12,8 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   List<NotiObject> notiList = [];
 
-  String readRepositories = r'''
+
+  String getUserNotifications = '''
 query GetUserNotifications {
   GetUserNotifications(userID: 100, currentPage: 1){
     notifications{
@@ -42,76 +43,80 @@ query GetUserNotifications {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Row(
-            children: [
-              Text(
-                'Notification(${notiList.length})',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: Color(0xff131313),
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {},
-                child: Column(
-                  children: [
-                    const Text(
-                      'Clear All',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xff234455),
-                      ),
-                    ),
-                    Container(
-                      color: const Color(0xff234455),
-                      height: 1,
-                      width: 45,
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Query(
-          options: QueryOptions(
-            document: gql(readRepositories),
-          ),
-          builder: (QueryResult result, {refetch, fetchMore}) {
-            debugPrint('===========RESULT========${result.data}');
-            if (result.data == null) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final repositories = (result.data!["GetUserNotifications"]
-                ["notifications"] as List<dynamic>);
-            notiList = repositories.map(
+    return Query(
+      options: QueryOptions(
+        document: gql(getUserNotifications),
+      ),
+      builder: (QueryResult result, {refetch, fetchMore}) {
+        debugPrint('===========RESULT========${result.data}');
+        if (result.data == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final repositories = (result.data!["GetUserNotifications"]
+            ["notifications"] as List<dynamic>);
+        notiList = repositories
+            .map(
               (e) => NotiObject(
+                notiID: e['id'],
                 time: DateTime.fromMillisecondsSinceEpoch(e['createdAt']),
-                isRead: e['isRead'] == true,
+                isRead: e['isRead'] == 'true',
                 highlight: e['userID'].toString(),
                 itemAmount: 2,
                 orderId: e['orderID'],
                 title: e['title'],
                 notiTypes: getType(e['type']),
+                description: e['description'],
               ),
-            ).toList();
-            return Expanded(
+            )
+            .toList();
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Row(
+                children: [
+                  Text(
+                    'Notification(${notiList.length})',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Color(0xff131313),
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {},
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Clear All',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xff234455),
+                          ),
+                        ),
+                        Container(
+                          color: const Color(0xff234455),
+                          height: 1,
+                          width: 45,
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   return NotiItem(notiObject: notiList[index]);
                 },
                 itemCount: notiList.length,
               ),
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -134,9 +139,11 @@ class NotiObject {
     this.time,
     this.isRead,
     this.notiTypes,
+    this.description,
+    this.notiID,
   });
 
-  final String? title, orderId, highlight;
+  final String? title, orderId, highlight, description, notiID;
   final int? itemAmount;
   final DateTime? time;
   final bool? isRead;
