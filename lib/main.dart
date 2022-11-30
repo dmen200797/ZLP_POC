@@ -10,18 +10,18 @@ import 'package:zlp_poc/notification/ui/notification_screen.dart';
 
 import 'notification/bloc/noti_bloc.dart';
 
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print("Handling a background message: ${message.data}");
-  LocalNotificationService.instance.display(message);
-}
+// @pragma('vm:entry-point')
+// Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   await Firebase.initializeApp();
+//   print("Handling a background message: ${message.data}");
+//   LocalNotificationService.instance.display(message);
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await Fcm.instance.setUpNotificationBeforeRunApp();
+  // await Firebase.initializeApp();
+  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // await Fcm.instance.setUpNotificationBeforeRunApp();
   runApp(const MyApp());
 }
 
@@ -110,9 +110,9 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   void getToken() async {
-    Fcm.instance.showingComingNotification();
-    Fcm.instance.listenRemoteMessageOnOpenApp(context);
-    Fcm.instance.getInitialMessage(context);
+    // Fcm.instance.showingComingNotification();
+    // Fcm.instance.listenRemoteMessageOnOpenApp(context);
+    // Fcm.instance.getInitialMessage(context);
     final fcmToken = await FirebaseMessaging.instance.getToken();
     print('Token: $fcmToken');
   }

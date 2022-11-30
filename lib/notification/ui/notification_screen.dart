@@ -71,12 +71,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     return NotiItem(
                       notiObject: state.notiList[index],
                       onTap: () {
-                        context.read<NotiBloc>().add(
-                              UpdateNotiStatusEvent(
-                                notiID:
-                                    state.notiList[index].notiID.toString(),
-                              ),
-                            );
+                        print('index: $index');
+                        // context.read<NotiBloc>().add(
+                        //       UpdateNotiStatusEvent(
+                        //         notiID:
+                        //             state.notiList[index].notiID.toString(),
+                        //       ),
+                        //     );
                       },
                     );
                   },

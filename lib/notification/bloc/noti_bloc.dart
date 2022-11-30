@@ -99,6 +99,7 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
 
         final repositories = (queryResult.data!["GetUserNotifications"]
             ["notifications"] as List<dynamic>);
+        print('${repositories.toString()}');
         List<NotiObject> notiList = repositories
             .map(
               (e) => NotiObject(
