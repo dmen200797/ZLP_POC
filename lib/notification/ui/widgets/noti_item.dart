@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:zlp_poc/gen/assets.gen.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
-import 'package:intl/intl.dart';
 
 import '../../bloc/noti_bloc.dart';
 
@@ -18,12 +18,21 @@ class NotiItem extends StatefulWidget {
 }
 
 class _NotiItemState extends State<NotiItem> {
-  bool isShow = true;
+  bool isShow = false;
 
   @override
   void initState() {
-    widget.notiObject.isRead ?? true ? (isShow = false) : (isShow = true);
+    isShow = widget.notiObject.isRead ?? true;
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant NotiItem oldWidget) {
+    if (oldWidget.notiObject.isRead != widget.notiObject.isRead) {
+      isShow = widget.notiObject.isRead ?? true;
+      setState(() {});
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -31,7 +40,6 @@ class _NotiItemState extends State<NotiItem> {
     return BlocListener<NotiBloc, NotiState>(
       listener: (context, state) {
         if (state is UpdateNotiStatusState) {
-          // isShow = true;
           setState(() {});
         }
       },
@@ -102,7 +110,7 @@ class _NotiItemState extends State<NotiItem> {
               right: 16,
               top: 8,
               child: Visibility(
-                visible: isShow,
+                visible: !isShow,
                 child: Container(
                   width: 8,
                   height: 8,

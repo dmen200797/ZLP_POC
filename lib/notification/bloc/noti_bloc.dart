@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:meta/meta.dart';
 
 import '../ui/notification_screen.dart';
 
@@ -9,6 +9,7 @@ part 'noti_event.dart';
 part 'noti_state.dart';
 
 class NotiBloc extends Bloc<NotiEvent, NotiState> {
+  List<NotiObject> notiList = [];
   final HttpLink httpLink = HttpLink(
     'http://172.105.125.149:8090/query',
     defaultHeaders: {
@@ -37,8 +38,12 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
             document: gql(changeNotificationStatus),
           ),
         );
-
         if (queryResult.data?['changeNotificationStatus'] == true) {
+          int index = notiList.indexWhere(
+              (element) => element.notiID.toString() == event.notiID);
+          if (index != -1) {
+            notiList[index] = notiList[index].copyWith(isRead: true);
+          }
           emit(UpdateNotiStatusState(isRead: true));
         } else {
           emit(UpdateNotiStatusState(isRead: false));
@@ -46,8 +51,36 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
       },
     );
 
+    on<ClearAllNotiEvent>((event, emit) async {
+      String clearAllNoti = '''
+          mutation clearAllUserNotification {
+            clearAllUserNotification(userID: ${event.userID})
+          }
+           ''';
+
+      GraphQLClient client = GraphQLClient(
+        link: httpLink,
+        // The default store is the InMemoryStore, which does NOT persist to disk
+        cache: GraphQLCache(),
+      );
+
+      try {
+        QueryResult queryResult = await client.query(
+          QueryOptions(
+            document: gql(clearAllNoti),
+          ),
+        );
+        if (queryResult.data?['clearAllUserNotification'] == true) {
+          emit(DeletedAllNotiState());
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    });
+
     on<GetNotiEvent>(
       (event, emit) async {
+        emit(LoadingState());
         String getUserNotifications = '''
         query GetUserNotifications {
           GetUserNotifications(userID: ${event.userID}, currentPage: 1){
@@ -99,13 +132,12 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
 
         final repositories = (queryResult.data!["GetUserNotifications"]
             ["notifications"] as List<dynamic>);
-        print('${repositories.toString()}');
-        List<NotiObject> notiList = repositories
+        notiList = repositories
             .map(
               (e) => NotiObject(
                 notiID: e['id'],
                 time: DateTime.fromMillisecondsSinceEpoch(e['createdAt']),
-                isRead: e['isRead'] == 'true',
+                isRead: e['isRead'] == true,
                 highlight: e['userID'].toString(),
                 itemAmount: 2,
                 orderId: e['orderID'],
@@ -115,7 +147,6 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
               ),
             )
             .toList();
-
         emit(GotNotiState(notiList: notiList));
       },
     );
