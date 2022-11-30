@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
+
+import 'notification/bloc/noti_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HttpLink httpLink =
-        HttpLink('http://172.105.125.149:8090/query', defaultHeaders: {
+    HttpLink('http://172.105.125.149:8090/query', defaultHeaders: {
       'accept': '*/*',
       'Content-Type': 'application/json;charset=UTF-8',
     });
@@ -61,23 +64,27 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  final List<Widget> widgetOptions = const [
-    Text(
+  final List<Widget> widgetOptions = [
+    const Text(
       'Index 0: Home',
     ),
-    Text(
+    const Text(
       'Index 1: Product',
     ),
-    Text(
+    const Text(
       'Index 2: Orders',
     ),
-    NotificationScreen(),
-    Text(
+    BlocProvider(
+      create: (context) => NotiBloc(),
+      child: NotificationScreen(),
+    ),
+    const Text(
       'Index 4: Account',
     ),
   ];
 
-  List<BottomNavigationBarItem> get listBottomItem => [
+  List<BottomNavigationBarItem> get listBottomItem =>
+      [
         const BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
@@ -127,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body:
-          SafeArea(child: Center(child: widgetOptions.elementAt(currentIndex))),
+      SafeArea(child: Center(child: widgetOptions.elementAt(currentIndex))),
       bottomNavigationBar: BottomNavigationBar(
         items: listBottomItem,
         currentIndex: currentIndex,
