@@ -1,9 +1,24 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:zlp_poc/notification/fcm.dart';
+import 'package:zlp_poc/notification/local_notification_service.dart';
+import 'package:zlp_poc/notification/push_notification.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
 
-void main() {
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.data}");
+  LocalNotificationService.instance.display(message);
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await Fcm.instance.setUpNotificationBeforeRunApp();
   runApp(const MyApp());
 }
 
@@ -58,7 +73,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    getToken();
+    LocalNotificationService.instance.initializeSettings(context);
+    afterBuild(() async {
+      await PushNotification.instance.requestNotificationPermission();
+    });
     super.initState();
+  }
+
+  static void afterBuild(Function callback) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      callback();
+    });
   }
 
   final List<Widget> widgetOptions = const [
@@ -76,6 +102,14 @@ class _MyHomePageState extends State<MyHomePage> {
       'Index 4: Account',
     ),
   ];
+
+  void getToken() async {
+    Fcm.instance.showingComingNotification();
+    Fcm.instance.listenRemoteMessageOnOpenApp(context);
+    Fcm.instance.getInitialMessage(context);
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('Token: $fcmToken');
+  }
 
   List<BottomNavigationBarItem> get listBottomItem => [
         const BottomNavigationBarItem(
