@@ -46,8 +46,36 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
       },
     );
 
+    on<ClearAllNotiEvent>((event, emit) async {
+      String clearAllNoti = '''
+          mutation clearAllUserNotification {
+            clearAllUserNotification(userID: ${event.userID})
+          }
+           ''';
+
+      GraphQLClient client = GraphQLClient(
+        link: httpLink,
+        // The default store is the InMemoryStore, which does NOT persist to disk
+        cache: GraphQLCache(),
+      );
+
+      try {
+        QueryResult queryResult = await client.query(
+          QueryOptions(
+            document: gql(clearAllNoti),
+          ),
+        );
+        if (queryResult.data?['clearAllUserNotification'] == true) {
+          emit(DeletedAllNotiState());
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    });
+
     on<GetNotiEvent>(
       (event, emit) async {
+        emit(LoadingState());
         String getUserNotifications = '''
         query GetUserNotifications {
           GetUserNotifications(userID: ${event.userID}, currentPage: 1){

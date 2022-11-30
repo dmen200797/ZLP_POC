@@ -12,8 +12,11 @@ class UpdateNotiStatusState extends NotiState {
 
   UpdateNotiStatusState({required this.isRead});
 }
+
 class GotNotiState extends NotiState {
   final List<NotiObject> notiList;
 
   GotNotiState({required this.notiList});
 }
+
+class DeletedAllNotiState extends NotiState {}

@@ -23,11 +23,68 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NotiBloc, NotiState>(
+    return BlocConsumer<NotiBloc, NotiState>(
+      listener: (context, state) {
+        if (state is DeletedAllNotiState) {
+          context.read<NotiBloc>().add(GetNotiEvent(userID: '100'));
+        }
+      },
+      buildWhen: (_, current) =>
+          current is LoadingState || current is GotNotiState,
       builder: (context, state) {
         if (state is LoadingState) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is GotNotiState) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Notification()',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Color(0xff131313),
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {},
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              context
+                                  .read<NotiBloc>()
+                                  .add(ClearAllNotiEvent(userID: '100'));
+                            },
+                            child: const Text(
+                              'Clear All',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xff234455),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            color: const Color(0xff234455),
+                            height: 1,
+                            width: 45,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(
+                child: Center(child: CircularProgressIndicator())
+              ),
+            ],
+          );
+          // return const Center(child: CircularProgressIndicator());
+        }
+        if (state is GotNotiState) {
           return Column(
             children: [
               Padding(
@@ -47,11 +104,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       onPressed: () {},
                       child: Column(
                         children: [
-                          const Text(
-                            'Clear All',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xff234455),
+                          InkWell(
+                            onTap: () {
+                              context
+                                  .read<NotiBloc>()
+                                  .add(ClearAllNotiEvent(userID: '100'));
+                            },
+                            child: const Text(
+                              'Clear All',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xff234455),
+                              ),
                             ),
                           ),
                           Container(
@@ -66,28 +130,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return NotiItem(
-                      notiObject: state.notiList[index],
-                      onTap: () {
-                        context.read<NotiBloc>().add(
-                              UpdateNotiStatusEvent(
-                                notiID:
-                                    state.notiList[index].notiID.toString(),
-                              ),
-                            );
-                      },
-                    );
-                  },
-                  itemCount: state.notiList.length,
-                ),
+                child: state.notiList.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No Notification for you',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color(
+                                0xff4F6977,
+                              )),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemBuilder: (context, index) {
+                          return NotiItem(
+                            notiObject: state.notiList[index],
+                            onTap: () {
+                              context.read<NotiBloc>().add(
+                                    UpdateNotiStatusEvent(
+                                      notiID: state.notiList[index].notiID
+                                          .toString(),
+                                    ),
+                                  );
+                            },
+                          );
+                        },
+                        itemCount: state.notiList.length,
+                      ),
               ),
             ],
           );
-        } else {
-          return Container();
         }
+        return Container();
       },
     );
   }
