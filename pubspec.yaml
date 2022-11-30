@@ -47,6 +47,8 @@ dependencies:
   flutter_local_notifications: ^9.0.0
   android_path_provider: ^0.3.0
   path_provider: ^2.0.1
+  flutter_bloc: ^8.1.1
+  bloc: ^8.1.0
 
 dev_dependencies:
   build_runner:

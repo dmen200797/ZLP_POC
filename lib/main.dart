@@ -1,11 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:zlp_poc/notification/fcm.dart';
 import 'package:zlp_poc/notification/local_notification_service.dart';
 import 'package:zlp_poc/notification/push_notification.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
+
+import 'notification/bloc/noti_bloc.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -87,18 +90,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  final List<Widget> widgetOptions = const [
-    Text(
+  final List<Widget> widgetOptions = [
+    const Text(
       'Index 0: Home',
     ),
-    Text(
+    const Text(
       'Index 1: Product',
     ),
-    Text(
+    const Text(
       'Index 2: Orders',
     ),
-    NotificationScreen(),
-    Text(
+    BlocProvider(
+      create: (context) => NotiBloc(),
+      child: const NotificationScreen(),
+    ),
+    const Text(
       'Index 4: Account',
     ),
   ];

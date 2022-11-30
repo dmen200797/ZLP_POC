@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zlp_poc/gen/assets.gen.dart';
 import 'package:zlp_poc/notification/ui/notification_screen.dart';
 import 'package:intl/intl.dart';
 
+import '../../bloc/noti_bloc.dart';
+
 class NotiItem extends StatefulWidget {
   final NotiObject notiObject;
+  final GestureTapCallback onTap;
 
-  const NotiItem({Key? key, required this.notiObject}) : super(key: key);
+  const NotiItem({Key? key, required this.notiObject, required this.onTap})
+      : super(key: key);
 
   @override
   State<NotiItem> createState() => _NotiItemState();
@@ -23,79 +28,91 @@ class _NotiItemState extends State<NotiItem> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        isShow = false;
-        setState(() {});
+    return BlocListener<NotiBloc, NotiState>(
+      listener: (context, state) {
+        if (state is UpdateNotiStatusState) {
+          // isShow = true;
+          setState(() {});
+        }
       },
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: getNotiImage(widget.notiObject.notiTypes),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.notiObject.title ?? '',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        getContent(widget.notiObject),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Text(
-                              '${DateFormat('dd MMM yyyy').format(widget.notiObject.time ?? DateTime.now())} at ${widget.notiObject.time?.hour}:${widget.notiObject.time?.minute} | ',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Color(0xffA1A1A1),
-                              ),
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        width: 50,
+                        child: getNotiImage(widget.notiObject.notiTypes),
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.notiObject.title ?? '',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
-                            calculateTime(
-                                widget.notiObject.time ?? DateTime.now()),
-                          ],
-                        ),
-                      ],
-                    )
-                  ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            widget.notiObject.description ?? '',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xff656565),
+                            ),
+                          ),
+                          // getContent(widget.notiObject),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text(
+                                '${DateFormat('dd MMM yyyy').format(widget.notiObject.time ?? DateTime.now())} at ${widget.notiObject.time?.hour}:${widget.notiObject.time?.minute} | ',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xffA1A1A1),
+                                ),
+                              ),
+                              calculateTime(
+                                  widget.notiObject.time ?? DateTime.now()),
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                const Divider(
+                  color: Color(0xffE8E8E8),
+                  thickness: 1.5,
+                  height: 0,
+                ),
+              ],
+            ),
+            Positioned(
+              right: 16,
+              top: 8,
+              child: Visibility(
+                visible: isShow,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                      color: Color(0xffE7A546), shape: BoxShape.circle),
                 ),
               ),
-              const Divider(
-                color: Color(0xffE8E8E8),
-                thickness: 1.5,
-                height: 0,
-              ),
-            ],
-          ),
-          Positioned(
-            right: 16,
-            top: 8,
-            child: Visibility(
-              visible: isShow,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                    color: Color(0xffE7A546), shape: BoxShape.circle),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
